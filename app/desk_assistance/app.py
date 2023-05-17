@@ -1,3 +1,4 @@
+from abc import abstractmethod, ABC
 import asyncio
 
 from app.desk_assistance.config import AppConfig
@@ -29,3 +30,9 @@ class App(PluginsBearer["AppPlugin"]):
         #  method.
 
         asyncio.run(self._run())
+
+
+class AppPlugin(Plugin[App], ABC):
+    @abstractmethod
+    def on_app_run(self):
+        ...
