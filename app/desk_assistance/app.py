@@ -4,7 +4,7 @@ from app.desk_assistance.config import AppConfig
 from app.desk_assistance.plugin import PluginsBearer, Plugin
 
 
-class App(PluginsBearer):
+class App(PluginsBearer["AppPlugin"]):
     def __init__(self, *, config: AppConfig | None = None):
         self._config = config or AppConfig()
 
