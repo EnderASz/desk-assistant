@@ -1,12 +1,14 @@
 import asyncio
 
-from app.desk_assistance.plugin import PluginsBearer
+from app.desk_assistance.plugin import PluginsBearer, Plugin
 
 
 class App(PluginsBearer):
     @classmethod
-    def create(cls):
-        return cls()
+    def create(cls, plugins: list[Plugin] | None):
+        app = cls()
+        for plugin in plugins or []:
+            app.register(plugin)
 
     async def _run(self):
         ...
