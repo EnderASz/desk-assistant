@@ -34,5 +34,5 @@ class App(PluginsBearer["AppPlugin"]):
 
 class AppPlugin(Plugin[App], ABC):
     @abstractmethod
-    def on_app_run(self):
+    async def on_app_run(self):
         ...
