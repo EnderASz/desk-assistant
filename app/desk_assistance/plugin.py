@@ -3,13 +3,13 @@ class Plugin:
         self._bound_bearer: "PluginsBearer" | None = None
 
     @property
-    def bound_bearer(self):
+    def bound_bearer(self) -> "PluginsBearer":
         return self._bound_bearer
 
-    def register_at(self, bearer: "PluginsBearer"):
+    def register_at(self, bearer: "PluginsBearer") -> None:
         bearer.register(self)
 
-    def unregister(self):
+    def unregister(self) -> None:
         self.bound_bearer.unregister(self)
 
 
