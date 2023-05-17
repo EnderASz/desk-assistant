@@ -2,13 +2,15 @@
 import click
 
 from app.desk_assistance.app import App
+from app.desk_assistance.config import AppConfig
 
 
 @click.command()
 def main():
-    app = App.create()
+    config = AppConfig()
+    app = App.create(config=config, plugins=[])
     app.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
