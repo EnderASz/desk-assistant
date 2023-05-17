@@ -18,6 +18,8 @@ class App(PluginsBearer):
         for plugin in plugins or []:
             app.register(plugin)
 
+        return app
+
     async def _run(self):
         ...
 
