@@ -1,20 +1,28 @@
+import typing as t
+from enum import Enum
+from typing import Self
 from abc import abstractmethod, ABC
 import asyncio
+import contextlib
 
-from app.desk_assistance.config import AppConfig
-from app.desk_assistance.plugin import PluginsBearer, Plugin
+from desk_assistance.config import AppConfig
+from desk_assistance.plugin import PluginsBearer, Plugin
 
 
-class App(PluginsBearer["AppPlugin"]):
+class App(PluginsBearer["AppPlugin"], contextlib.AbstractAsyncContextManager):
     def __init__(self, *, config: AppConfig | None = None):
-        self._config = config or AppConfig()
+        super().__init__()
+
+        self._config: AppConfig = config or AppConfig()
 
     @property
-    def config(self):
+    def config(self) -> AppConfig:
         return self._config
 
     @classmethod
-    def create(cls, *, plugins: list[Plugin] | None, config: AppConfig):
+    def create(
+        cls, *, plugins: list[Plugin] | None, config: AppConfig
+    ) -> Self:
         app = cls(config=config)
         for plugin in plugins or []:
             app.register(plugin)
@@ -33,6 +41,10 @@ class App(PluginsBearer["AppPlugin"]):
 
 
 class AppPlugin(Plugin[App], ABC):
+    """
+    Plugin applicable to App instance
+    """
+
     @abstractmethod
     async def on_app_run(self):
         ...
