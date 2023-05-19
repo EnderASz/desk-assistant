@@ -3,6 +3,8 @@ from abc import ABC
 from typing import Self
 import contextlib
 
+if t.TYPE_CHECKING:
+    from desk_assistance.event import Event
 
 PluginsBearerT = t.TypeVar(
     "PluginsBearerT", bound="PluginsBearer", covariant=True
@@ -70,6 +72,9 @@ class PluginsBearer(
         self._plugins.remove(plugin)
         plugin.bound_bearer = None
 
+    async def trigger(self, event: "Event"):
+        for plugin in self._plugins:
+            await plugin.trigger(event)
 
 
 class Plugin(
@@ -87,3 +92,6 @@ class Plugin(
 
     def unregister(self) -> None:
         self.bound_bearer.unregister(self)
+
+    async def trigger(self, event: "Event"):
+        await event.trigger_at(self)
