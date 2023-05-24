@@ -10,7 +10,7 @@ from desk_assistance.plugin import PluginsBearer, Plugin
 from desk_assistance.event import Event
 
 
-class App(PluginsBearer["AppPlugin"], contextlib.AbstractAsyncContextManager):
+class App(PluginsBearer["AppPlugin"]):
     def __init__(self, *, config: AppConfig | None = None):
         super().__init__()
 
