@@ -8,7 +8,7 @@ from app.desk_assistance.config import AppConfig
 @click.command()
 def main():
     config = AppConfig()
-    app = App.create(config=config, plugins=[])
+    app = App.create(config=config)
     app.run()
 
 

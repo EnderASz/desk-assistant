@@ -21,10 +21,12 @@ class App(PluginsBearer["AppPlugin"], contextlib.AbstractAsyncContextManager):
         return self._config
 
     @classmethod
-    def create(
-        cls, *, plugins: list[Plugin] | None, config: AppConfig
-    ) -> Self:
+    def create(cls, *, config: AppConfig) -> Self:
         app = cls(config=config)
+
+        # TODO: Load plugins
+        plugins = []
+
         for plugin in plugins or []:
             app.register(plugin)
 
