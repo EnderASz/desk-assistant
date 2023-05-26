@@ -32,18 +32,11 @@ class App(PluginsBearer["AppPlugin"]):
 
         return app
 
-    async def _run(self):
+    async def run(self):
         async with self:
             await self.trigger(AppRunEvent())
 
             await self.trigger(AppCloseEvent())
-
-    def run(self):
-        # TODO: Raise exception if this or any other app instance is currently
-        #  running. Also consider if this check should be here or at `App._run`
-        #  method.
-
-        asyncio.run(self._run())
 
 
 class AppPlugin(Plugin[App], ABC):
