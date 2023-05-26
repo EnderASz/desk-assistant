@@ -11,7 +11,12 @@ from desk_assistance.config import AppConfig
 def main():
     config = AppConfig()
     app = App.create(config=config)
-    asyncio.run(app.run())
+
+    async def _app_run():
+        async with app:
+            await app.run()
+
+    asyncio.run(_app_run())
 
 
 if __name__ == "__main__":

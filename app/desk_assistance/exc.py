@@ -12,3 +12,7 @@ class EventNotSupported(NotImplementedError):
 
 class ContextAlreadyEntered(Exception):
     ...
+
+
+class MissingContext(Exception):
+    ...
