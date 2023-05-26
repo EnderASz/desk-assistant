@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import click
 
-from app.desk_assistance.app import App
-from app.desk_assistance.config import AppConfig
+from desk_assistance.app import App
+from desk_assistance.config import AppConfig
 
 
 @click.command()
