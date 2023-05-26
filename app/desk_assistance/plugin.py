@@ -1,5 +1,6 @@
 import typing as t
 from abc import ABC, abstractmethod
+from types import TracebackType
 from typing import Self
 import contextlib
 
@@ -39,7 +40,12 @@ class AbstractAsyncContextStack(ABC, contextlib.AbstractAsyncContextManager):
 
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(
+        self,
+        exc_type: t.Type[BaseException] | None,
+        exc_val: t.Type[BaseException] | None,
+        exc_tb: TracebackType | None,
+    ) -> bool | None:
         if self._context_stack is None:
             return
 
