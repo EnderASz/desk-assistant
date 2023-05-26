@@ -15,7 +15,7 @@ PluginsBearerT = t.TypeVar(
 PluginT = t.TypeVar("PluginT", bound="Plugin", covariant=True)
 
 
-class AbstractAsyncContextStack(ABC, contextlib.AbstractAsyncContextManager):
+class AbstractAsyncContextStack(contextlib.AbstractAsyncContextManager, ABC):
     def __init__(self):
         self._context_stack: contextlib.AsyncExitStack | None = None
 
@@ -106,7 +106,7 @@ class PluginsBearer(t.Generic[PluginT], AbstractAsyncContextStack):
             await event.trigger_at(plugin)
 
 
-class Plugin(t.Generic[PluginsBearerT], ABC, AbstractAsyncContextStack):
+class Plugin(t.Generic[PluginsBearerT], AbstractAsyncContextStack, ABC):
     def __init__(self):
         super().__init__()
         self._bearer: PluginsBearerT | None = None
