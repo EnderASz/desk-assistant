@@ -5,6 +5,7 @@ from abc import abstractmethod, ABC
 import asyncio
 import contextlib
 
+from desk_assistance import exc
 from desk_assistance.config import AppConfig
 from desk_assistance.plugin import PluginsBearer, Plugin
 from desk_assistance.event import Event
@@ -33,10 +34,18 @@ class App(PluginsBearer["AppPlugin"]):
         return app
 
     async def run(self):
-        async with self:
-            await self.trigger(AppRunEvent())
+        if not self.context_entered:
+            raise exc.MissingContext(
+                f"You are unable to run {self} for now. Please ensure context "
+                f"when dealing with {self.__class__.__name__} context "
+                f"dependent methods."
+            )
 
-            await self.trigger(AppCloseEvent())
+        await self.trigger(AppRunEvent())
+
+        ...
+
+        await self.trigger(AppCloseEvent())
 
 
 class AppPlugin(Plugin[App], ABC):
