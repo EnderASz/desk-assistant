@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod
 from typing import Self
 import contextlib
 
+from desk_assistance import exc
+
 if t.TYPE_CHECKING:
     from desk_assistance.event import Event
 
@@ -63,6 +65,10 @@ class PluginsBearer(t.Generic[PluginT], AbstractAsyncContextStack):
         return context_stack
 
     def register(self, plugin: PluginT):
+        if self.context_entered:
+            raise exc.ContextAlreadyEntered(
+                "Cannot register plugin to already context entered bearer"
+            )
         # TODO: Choose politic for "plugin already bound to something"
         #  - Option 1 - Raise only when plugin bound to another plugin bearer
         #  - Option 2 - Raise when plugin bound to any plugin bearer
@@ -77,6 +83,10 @@ class PluginsBearer(t.Generic[PluginT], AbstractAsyncContextStack):
         plugin.bound_bearer = self
 
     def unregister(self, plugin: PluginT):
+        if self.context_entered:
+            raise exc.ContextAlreadyEntered(
+                "Cannot unregister plugin from already context entered bearer"
+            )
         if plugin.bound_bearer is not self:
             # TODO: Consider raising exception (cannot unregister plugin non
             #  registered at this bearer). This decision should be consistent
@@ -100,7 +110,15 @@ class Plugin(t.Generic[PluginsBearerT], ABC, AbstractAsyncContextStack):
         return self._bearer
 
     def register_at(self, bearer: PluginsBearerT) -> None:
+        if self.context_entered:
+            raise exc.ContextAlreadyEntered(
+                "Cannot register already context entered plugin"
+            )
         bearer.register(self)
 
     def unregister(self) -> None:
+        if self.context_entered:
+            raise exc.ContextAlreadyEntered(
+                "Cannot unregister already context entered plugin"
+            )
         self.bearer.unregister(self)
