@@ -2,13 +2,12 @@ import typing as t
 from enum import Enum
 from typing import Self
 from abc import abstractmethod, ABC
-import asyncio
-import contextlib
+
+from core_lib.plugin import PluginsBearer, Plugin
+from core_lib.event import Event
 
 from desk_assistance import exc
 from desk_assistance.config import AppConfig
-from desk_assistance.plugin import PluginsBearer, Plugin
-from desk_assistance.event import Event
 
 
 class App(PluginsBearer["AppPlugin"]):
