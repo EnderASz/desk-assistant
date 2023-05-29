@@ -4,10 +4,10 @@ from types import TracebackType
 from typing import Self
 import contextlib
 
-from desk_assistance import exc
+from core_lib import exc
 
 if t.TYPE_CHECKING:
-    from desk_assistance.event import Event
+    from core_lib.event import Event
 
 PluginsBearerT = t.TypeVar(
     "PluginsBearerT", bound="PluginsBearer", covariant=True
