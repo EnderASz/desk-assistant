@@ -1,3 +1,4 @@
+import asyncio
 import typing as t
 from enum import Enum
 from typing import Self
@@ -15,6 +16,11 @@ class App(PluginsBearer["AppPlugin"]):
         super().__init__()
 
         self._config: AppConfig = config or AppConfig()
+        self._run_lock = asyncio.Lock()
+
+    @property
+    def running(self):
+        return self._run_lock.locked()
 
     @property
     def config(self) -> AppConfig:
@@ -39,12 +45,19 @@ class App(PluginsBearer["AppPlugin"]):
                 f"when dealing with {self.__class__.__name__} context "
                 f"dependent methods."
             )
+        if self.running:
+            raise exc.AppAlreadyRunning(
+                f"You are unable to run {self} for now. It's already running. "
+                f"{self.__class__.__name__} instance can only be ran once at "
+                f"the time."
+            )
 
-        await self.trigger(AppRunEvent())
+        async with self._run_lock:
+            await self.trigger(AppRunEvent())
 
-        ...
+            ...
 
-        await self.trigger(AppCloseEvent())
+            await self.trigger(AppCloseEvent())
 
 
 class AppPlugin(Plugin[App], ABC):
