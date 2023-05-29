@@ -3,7 +3,7 @@ from enum import Enum
 
 from pydantic import BaseModel
 
-from desk_assistance.exc import EventNotSupported
+from core_lib.exc import EventNotSupported
 
 
 class EventType(str, Enum):
