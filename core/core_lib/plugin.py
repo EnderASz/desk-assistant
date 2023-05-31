@@ -70,36 +70,41 @@ class PluginsBearer(t.Generic[PluginT], AbstractAsyncContextStack):
 
         return context_stack
 
-    def register(self, plugin: PluginT):
+    def register(self, plugin: PluginT) -> None:
+        """
+        Registers and bounds plugin.
+
+        :param plugin: Plugin instance
+        """
         if self.context_entered:
             raise exc.ContextAlreadyEntered(
                 "Cannot register plugin to already context entered bearer"
             )
-        # TODO: Choose politic for "plugin already bound to something"
-        #  - Option 1 - Raise only when plugin bound to another plugin bearer
-        #  - Option 2 - Raise when plugin bound to any plugin bearer
-        if plugin.bound_bearer is not None:
-            # TODO: When chose Option 2 in above TODO remove below condition
-            #  and return
-            if plugin.bound_bearer is self:
-                return
-            raise ...
+
+        if plugin.bearer is not None:
+            raise exc.PluginAlreadyRegistered(
+                "Cannot register plugin that is already registered at any "
+                "plugin plugin bearer"
+            )
 
         self._plugins.append(plugin)
-        plugin.bound_bearer = self
+        plugin._bearer = self
 
-    def unregister(self, plugin: PluginT):
+    def unregister(self, plugin: PluginT) -> None:
+        """
+        Unregisters and unbound plugin..
+        :param plugin:
+        """
         if self.context_entered:
             raise exc.ContextAlreadyEntered(
                 "Cannot unregister plugin from already context entered bearer"
             )
         if plugin.bound_bearer is not self:
-            # TODO: Consider raising exception (cannot unregister plugin non
-            #  registered at this bearer). This decision should be consistent
-            #  with politic chosen at `PluginBearer.register` method
-            return
+            raise exc.PluginNotRegistered(
+                f"{self} cannot unregister non-registered plugin."
+            )
         self._plugins.remove(plugin)
-        plugin.bound_bearer = None
+        plugin._bearer = None
 
     async def trigger(self, event: "Event"):
         for plugin in self.plugins:
@@ -114,17 +119,3 @@ class Plugin(t.Generic[PluginsBearerT], AbstractAsyncContextStack, ABC):
     @property
     def bearer(self) -> PluginsBearerT:
         return self._bearer
-
-    def register_at(self, bearer: PluginsBearerT) -> None:
-        if self.context_entered:
-            raise exc.ContextAlreadyEntered(
-                "Cannot register already context entered plugin"
-            )
-        bearer.register(self)
-
-    def unregister(self) -> None:
-        if self.context_entered:
-            raise exc.ContextAlreadyEntered(
-                "Cannot unregister already context entered plugin"
-            )
-        self.bearer.unregister(self)
