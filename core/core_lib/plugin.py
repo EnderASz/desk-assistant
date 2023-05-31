@@ -1,56 +1,18 @@
 import typing as t
-from abc import ABC, abstractmethod
-from types import TracebackType
-from typing import Self
+from abc import ABC
 import contextlib
 
 from core_lib import exc
+from core_lib.context import AbstractAsyncContextStackManager
 
 if t.TYPE_CHECKING:
     from core_lib.event import Event
+
 
 PluginsBearerT = t.TypeVar(
     "PluginsBearerT", bound="PluginsBearer", covariant=True
 )
 PluginT = t.TypeVar("PluginT", bound="Plugin", covariant=True)
-
-
-class AbstractAsyncContextStack(contextlib.AbstractAsyncContextManager, ABC):
-    def __init__(self):
-        self._context_stack: contextlib.AsyncExitStack | None = None
-
-    @property
-    def context_entered(self) -> bool:
-        return self._context_stack is not None
-
-    @abstractmethod
-    async def _establish_context(
-        self, context_stack: contextlib.AsyncExitStack
-    ) -> contextlib.AsyncExitStack:
-        ...
-
-    async def __aenter__(self) -> Self:
-        if self.context_entered:
-            return self
-
-        context_stack = contextlib.AsyncExitStack()
-        async with context_stack:
-            context_stack = await self._establish_context(context_stack)
-            self._context_stack = context_stack.pop_all()
-
-        return self
-
-    async def __aexit__(
-        self,
-        exc_type: t.Type[BaseException] | None,
-        exc_val: t.Type[BaseException] | None,
-        exc_tb: TracebackType | None,
-    ) -> bool | None:
-        if self._context_stack is None:
-            return
-
-        await self._context_stack.aclose()
-        self._context_stack = None
 
 
 class PluginsBearer(t.Generic[PluginT], AbstractAsyncContextStack):
@@ -111,7 +73,7 @@ class PluginsBearer(t.Generic[PluginT], AbstractAsyncContextStack):
             await event.trigger_at(plugin)
 
 
-class Plugin(t.Generic[PluginsBearerT], AbstractAsyncContextStack, ABC):
+class Plugin(t.Generic[PluginsBearerT], AbstractAsyncContextStackManager, ABC):
     def __init__(self):
         super().__init__()
         self._bearer: PluginsBearerT | None = None
