@@ -60,11 +60,7 @@ class App(PluginsBearer["AppPlugin"]):
             await self.trigger(AppCloseEvent())
 
 
-class AppPlugin(Plugin[App], ABC):
-    """
-    Plugin applicable to App instance
-    """
-
+class AppEventHandler(t.Protocol):
     @abstractmethod
     async def on_app_run(self):
         ...
@@ -77,6 +73,12 @@ class AppPlugin(Plugin[App], ABC):
 class AppEventType(str, Enum):
     APP_RUN = "APP_RUN"
     APP_CLOSE = "APP_CLOSE"
+
+
+class AppPlugin(Plugin[App], AppEventHandler, ABC):
+    """
+    Plugin applicable to App instance
+    """
 
 
 class AppEvent(Event[AppPlugin]):
