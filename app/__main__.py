@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 import asyncio
 
-import click
+import typer
 
 from desk_assistance.app import App
 from desk_assistance.config import AppConfig
 
 
-@click.command()
+cli = typer.Typer()
+
+
+@cli.command()
 def main():
     config = AppConfig()
     app = App.create(config=config)
@@ -20,4 +23,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    cli()
