@@ -15,7 +15,7 @@ PluginsBearerT = t.TypeVar(
 PluginT = t.TypeVar("PluginT", bound="Plugin", covariant=True)
 
 
-class PluginsBearer(t.Generic[PluginT], AbstractAsyncContextStack):
+class PluginsBearer(t.Generic[PluginT], AbstractAsyncContextStackManager):
     def __init__(self):
         super().__init__()
         self._plugins: list[PluginT] = []
